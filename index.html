@@ -171,6 +171,8 @@ textarea.in{min-height:84px;resize:vertical}
 .mini-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .mini-h h3{margin:0}
 .mini{position:relative;display:block;width:100%;height:190px;overflow:hidden;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--plan-bg);cursor:pointer}
+.pickplan{display:flex;align-items:center;justify-content:center;gap:8px}
+.pickbar{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:6;box-shadow:0 6px 24px rgba(0,0,0,.18)}
 .mini .planin{position:absolute;left:0;top:0}
 .spot{position:absolute;width:18px;height:18px;transform:translate(-50%,-50%);border-radius:50%;background:var(--open);border:3px solid #fff;box-shadow:0 0 0 2px var(--open);animation:pulse 1.6s ease-out infinite;z-index:2}
 .mini-l{position:absolute;left:8px;bottom:8px;background:var(--card);color:var(--ink);font-size:.78rem;font-weight:600;padding:3px 8px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
@@ -487,19 +489,19 @@ const TEMPL = ['Скол плитки', 'Не доделана затирка', 
 const TRADE_IMG = { 'Плитка': 'tile', 'Малярка': 'paint', 'Полы': 'floor', 'Потолки': 'ceiling', 'Двери': 'door', 'Сантехника': 'pipe', 'Электрика': 'socket', 'Прочее': 'paint' };
 const ST = { open: ['Открыто', 'p-open'], returned: ['Возвращено', 'p-open'], fixed: ['На приёмке', 'p-warn'], accepted: ['Принято', 'p-done'] };
 const MODS = {
-  summary: ['chart', 'Сводка'], objects: ['building', 'Объекты'], remarks: ['clip', 'Замечания'], accept: ['check', 'На приёмку'], plan: ['plan', 'План'],
+  newRemark: ['cam', 'Новое замечание'], summary: ['chart', 'Сводка'], objects: ['building', 'Объекты'], remarks: ['clip', 'Замечания'], accept: ['check', 'На приёмку'], plan: ['plan', 'План'],
   chat: ['chat', 'Связь'], delivery: ['truck', 'Приёмка'], materials: ['bags', 'Материалы'], tools: ['wrench', 'Инструмент'], hours: ['clock', 'Часы'],
   works: ['ruler', 'Объёмы и КС-6'], docs: ['doc', 'Документы'], payset: ['rub', 'Ставки и выплаты'], people: ['people', 'Люди'], reports: ['doc', 'Отчёты'], settings: ['key', 'Коды и планы'], trash: ['list', 'Корзина'],
   companies: ['building', 'Компании'], adminpeople: ['people', 'Все люди'], audit: ['list', 'Журнал действий'], server: ['server', 'Сервер и копии'], ai: ['cpu', 'ИИ: расход'], billing: ['rub', 'Оплаты']
 };
 const TILES = {
   admin: [['companies', 'f'], ['settings', 'f', 'Объекты и коды'], ['adminpeople', 'f'], ['audit', 'f'], ['trash', 'f'], ['server', 'f'], ['ai', 'f'], ['billing', 'f'], ['summary', 'v']],
-  dir: [['summary', 'f'], ['objects', 'f'], ['remarks', 'f'], ['plan', 'f'], ['chat', 'f'], ['delivery', 'f'], ['materials', 'f'], ['tools', 'f'], ['hours', 'f', 'Часы и табель'], ['works', 'f'], ['docs', 'f'], ['people', 'f'], ['reports', 'f'], ['settings', 'f'], ['trash', 'f']],
-  pm: [['summary', 'f'], ['objects', 'f'], ['remarks', 'f'], ['plan', 'f'], ['chat', 'f'], ['delivery', 'f'], ['materials', 'f'], ['tools', 'f'], ['hours', 'f', 'Часы и табель'], ['works', 'f'], ['docs', 'f'], ['people', 'f'], ['reports', 'f'], ['settings', 'f'], ['trash', 'f']],
-  nach: [['summary', 'f'], ['remarks', 'f'], ['plan', 'f'], ['chat', 'f'], ['delivery', 'f'], ['materials', 'f'], ['tools', 'f'], ['hours', 'f', 'Часы и табель'], ['works', 'f'], ['docs', 'f'], ['people', 'f'], ['reports', 'f'], ['settings', 'f'], ['trash', 'f']],
+  dir: [['newRemark', 'f'], ['summary', 'f'], ['objects', 'f'], ['remarks', 'f'], ['plan', 'f'], ['chat', 'f'], ['delivery', 'f'], ['materials', 'f'], ['tools', 'f'], ['hours', 'f', 'Часы и табель'], ['works', 'f'], ['docs', 'f'], ['people', 'f'], ['reports', 'f'], ['settings', 'f'], ['trash', 'f']],
+  pm: [['newRemark', 'f'], ['summary', 'f'], ['objects', 'f'], ['remarks', 'f'], ['plan', 'f'], ['chat', 'f'], ['delivery', 'f'], ['materials', 'f'], ['tools', 'f'], ['hours', 'f', 'Часы и табель'], ['works', 'f'], ['docs', 'f'], ['people', 'f'], ['reports', 'f'], ['settings', 'f'], ['trash', 'f']],
+  nach: [['newRemark', 'f'], ['summary', 'f'], ['remarks', 'f'], ['plan', 'f'], ['chat', 'f'], ['delivery', 'f'], ['materials', 'f'], ['tools', 'f'], ['hours', 'f', 'Часы и табель'], ['works', 'f'], ['docs', 'f'], ['people', 'f'], ['reports', 'f'], ['settings', 'f'], ['trash', 'f']],
   kladov: [['delivery', 'f', 'Приёмка'], ['materials', 'f'], ['tools', 'f'], ['docs', 'f', 'Документы'], ['chat', 'f', 'Сообщения']],
-  prorab: [['remarks', 'f'], ['plan', 'f'], ['chat', 'f'], ['docs', 'f'], ['delivery', 'f'], ['materials', 'f'], ['tools', 'f'], ['hours', 'f', 'Часы'], ['works', 'f', 'Объёмы'], ['people', 'f', 'Моя бригада']],
-  master: [['remarks', 'f'], ['plan', 'f'], ['chat', 'f'], ['docs', 'f'], ['delivery', 'f'], ['materials', 'f'], ['tools', 'f'], ['hours', 'v', 'Табель'], ['works', 'f', 'Объёмы']],
+  prorab: [['newRemark', 'f'], ['remarks', 'f'], ['plan', 'f'], ['chat', 'f'], ['docs', 'f'], ['delivery', 'f'], ['materials', 'f'], ['tools', 'f'], ['hours', 'f', 'Часы'], ['works', 'f', 'Объёмы'], ['people', 'f', 'Моя бригада']],
+  master: [['newRemark', 'f'], ['remarks', 'f'], ['plan', 'f'], ['chat', 'f'], ['docs', 'f'], ['delivery', 'f'], ['materials', 'f'], ['tools', 'f'], ['hours', 'v', 'Табель'], ['works', 'f', 'Объёмы']],
   brig: [['remarks', 'f', 'Мои замечания'], ['chat', 'f'], ['hours', 'v', 'Табель бригады'], ['plan', 'v', 'План участка'], ['docs', 'v', 'Чертежи'], ['tools', 'v', 'Мой инструмент']],
   worker: [['remarks', 'f', 'Мои замечания'], ['chat', 'f', 'Сообщения'], ['tools', 'v', 'Мой инструмент'], ['hours', 'v', 'Мои часы'], ['docs', 'v', 'Чертежи']]
 };
@@ -1266,7 +1268,8 @@ function langPick() {
 }
 /* ===== главная ===== */
 const BIG = {
-  dir: ['cam', '+ Замечание', () => go('newRemark')], pm: ['cam', '+ Замечание', () => go('newRemark')], nach: ['cam', '+ Замечание', () => go('newRemark')], kladov: ['cam', 'Принять машину — фото накладной', () => go('accept', { step: 'photo' })], prorab: ['cam', '+ Замечание', () => go('newRemark')], master: ['cam', '+ Замечание', () => go('newRemark')],
+  // у тех, кто выдаёт замечания, большой кнопки нет: «Новое замечание» — обычная плитка (08.11)
+  kladov: ['cam', 'Принять машину — фото накладной', () => go('accept', { step: 'photo' })],
   brig: ['cam', 'Исправил — сфоткать', () => go('remarks', { st: 'todo', pick: true })], worker: ['cam', 'Исправил — сфоткать', () => go('remarks', { st: 'todo', pick: true })]
 };
 function badge(mod, p) {
@@ -1459,6 +1462,7 @@ function vNewRemark(pr) {
     picker(d.photo, v => set('photo', v)),
     h('div', { class: 'field' }, h('span', { class: 'lbl', text: 'Этаж' }), h('div', { class: 'chips' }, ['1', '2'].map(f => h('button', { class: 'chip', 'aria-pressed': String(d.floor === f), onclick: () => { d.floor = f; d.room = ''; rerender(); }, text: f + ' этаж' })))),
     h('div', { class: 'field' }, h('label', { for: 'rr', text: 'Помещение' }), h('select', { class: 'in', id: 'rr', onchange: e => set('room', e.target.value) }, h('option', { value: '', text: 'Выберите…' }), rooms.map(r => h('option', { value: r.code, selected: d.room === r.code, text: r.code + ' ' + r.name })))),
+    h('button', { class: 'ghost pickplan', onclick: () => go('pickRoom', { floor: d.floor, sel: d.room || null, focus: d.room || null }) }, I('plan', 18), d.room ? 'Посмотреть или сменить на плане' : 'Указать на плане'),
     d.room ? h('p', { class: 'hint', text: 'Секция ' + sectionOf(o, d.floor, d.room.slice(2)) + ', ' + d.floor + ' этаж' }) : null,
     h('div', { class: 'field' }, h('span', { class: 'lbl', text: 'Вид работ' }), h('div', { class: 'chips' }, TRADES.map(t => h('button', { class: 'chip', 'aria-pressed': String(d.trade === t), onclick: () => set('trade', t), text: t })))),
     h('div', { class: 'field' }, h('label', { for: 'rt', text: 'Описание' }), h('div', { class: 'chips' }, TEMPL.map(t => h('button', { class: 'chip', onclick: () => { d.text = d.text ? d.text + ', ' + t.toLowerCase() : t; rerender(); }, text: t }))), txt, h('p', { class: 'hint', text: 'Можно надиктовать: нажмите микрофон на клавиатуре телефона.' })),
@@ -1517,6 +1521,23 @@ function vPlan(pr) {
   out.push(h('div', { class: 'list' }, sections(o).map((s, i) => zoneRow(o, s, i))));
   return out;
 }
+// выбор помещения на плане из формы замечания (08.11): нажали на помещение → «Выбрать» → назад в форму, всё введённое на месте
+function vPickRoom(pr) {
+  const o = curObj(); const f = pr.floor || '1'; const P0 = PLANS[OBJ[o].name][f];
+  const prev = U.stack[U.stack.length - 1]; const d = prev && prev.view === 'newRemark' && prev.p.d;
+  if (!d) return [bar('Помещение на плане'), h('div', { class: 'empty', text: 'Откройте план из формы нового замечания.' })];
+  const r = pr.sel ? findRoom(o, pr.sel) : null;
+  const choose = () => { d.floor = f; d.room = pr.sel; back(); };
+  const out = [bar('Укажите помещение', OBJ[o].name)];
+  out.push(h('div', { class: 'chips' }, ['1', '2'].map(v => h('button', { class: 'chip', 'aria-pressed': String(f === v), onclick: () => { U.p.floor = v; U.p.sel = null; rerender(); }, text: v + ' этаж' }))));
+  out.push(h('p', { class: 'hint', text: 'Нажмите на точку в нужном помещении. Пальцами можно приблизить.' }));
+  out.push(drawing(o, f, P0, roomStats(o, f), Object.assign(pr, { room: pr.sel, pick: true })));
+  out.push(h('div', { class: 'card pickbar' }, r
+    ? [h('div', { class: 'room' }, r.code, h('span', { text: r.name })), h('div', { class: 'meta', text: 'секция ' + sectionOf(o, f, r.short) + ' · ' + f + ' этаж' + (r.area ? ' · ' + String(r.area).replace('.', ',') + ' м²' : '') }), h('button', { class: 'primary', onclick: choose, text: 'Выбрать это помещение' })]
+    : h('p', { class: 'hint', text: 'Помещение ещё не выбрано.' })));
+  out.push(h('button', { class: 'link', onclick: back, text: 'Вернуться к замечанию без выбора' }));
+  return out;
+}
 function zoneRow(o, s, i) {
   const key = zk(o, s);
   const n = D.remarks.filter(r => r.obj === o && r.sec === s && (r.status === 'open' || r.status === 'returned')).length;
@@ -1536,7 +1557,7 @@ function drawing(o, f, PL, st, pr) {
   for (const [sh, [x, y]] of Object.entries(PL.pos)) {
     const code = 'Д.' + sh; const s = st[code]; const r = findRoom(o, code);
     const cls = s ? (s.o ? 'o' : s.f ? 'f' : 'a') : '';
-    inner.append(h('button', { class: 'rm' + (cls ? ' has ' + cls : '') + (pr.room === code ? ' sel' : ''), style: `left:${x}%;top:${y}%`, title: code + (r ? ' ' + r.name : ''), 'aria-label': code + (r ? ' ' + r.name : ''), onclick: () => { U.p.room = code; rerender(); const el = document.getElementById('roompanel'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } },
+    inner.append(h('button', { class: 'rm' + (cls ? ' has ' + cls : '') + (pr.room === code ? ' sel' : ''), style: `left:${x}%;top:${y}%`, title: code + (r ? ' ' + r.name : ''), 'aria-label': code + (r ? ' ' + r.name : ''), onclick: () => { if (pr.pick) { U.p.sel = code; rerender(); const pb = document.querySelector('.pickbar'); if (pb) pb.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return; } U.p.room = code; rerender(); const el = document.getElementById('roompanel'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } },
       cls ? h('span', { class: 'b', text: s.o ? String(s.o) : s.f ? String(s.f) : '✓' }) : null));
   }
   box.append(inner);
@@ -2747,7 +2768,7 @@ function vDesign(pr) {
 }
 
 /* ===== отрисовка ===== */
-const VIEWS = { payout: vPayout, recount: vRecount, group: vGroup, chatFile: vChatFile, consent: vConsent, docs: vDocs, doc: vDoc, docAdd: vDocAdd, payset: vPaySet, outbox: vOutbox, trash: vTrash, design: vDesign, welcome: vWelcome, found: vFound, form: vForm, waiting: vWaiting, login: vLogin, switch: vSwitch, home: vHome, remarks: vRemarks, remark: vRemark, newRemark: vNewRemark, plan: vPlan, zone: vZone, chats: vChats, newDm: vNewDm, chat: vChat, hours: vHours, hoursEntry: vHoursEntry, tabel: vTabel, delivery: vDelivery, del: vDel, accept: vAccept, materials: vMaterials, mat: vMat, tools: vTools, people: vPeople, profile: vProfile, notes: vNotes, summary: vSummary, objects: vObjects, reports: vReports, settings: vSettings, works: vWorks, companies: vCompanies, audit: vAudit, server: vServer, ai: vAi, billing: vBilling };
+const VIEWS = { pickRoom: vPickRoom, payout: vPayout, recount: vRecount, group: vGroup, chatFile: vChatFile, consent: vConsent, docs: vDocs, doc: vDoc, docAdd: vDocAdd, payset: vPaySet, outbox: vOutbox, trash: vTrash, design: vDesign, welcome: vWelcome, found: vFound, form: vForm, waiting: vWaiting, login: vLogin, switch: vSwitch, home: vHome, remarks: vRemarks, remark: vRemark, newRemark: vNewRemark, plan: vPlan, zone: vZone, chats: vChats, newDm: vNewDm, chat: vChat, hours: vHours, hoursEntry: vHoursEntry, tabel: vTabel, delivery: vDelivery, del: vDel, accept: vAccept, materials: vMaterials, mat: vMat, tools: vTools, people: vPeople, profile: vProfile, notes: vNotes, summary: vSummary, objects: vObjects, reports: vReports, settings: vSettings, works: vWorks, companies: vCompanies, audit: vAudit, server: vServer, ai: vAi, billing: vBilling };
 function render() {
   if (!D.session.me && !PUB.includes(U.view)) { U.view = 'welcome'; U.stack = []; }
   else if (D.session.me && !PUB.includes(U.view)) { const p0 = P(D.session.me); if (p0 && p0.role !== 'admin' && p0.status === 'active' && !p0.consent) { U.view = 'consent'; U.p = { next: 'me', id: p0.id }; U.stack = []; } }
